@@ -1,18 +1,22 @@
 from pytube import YouTube, Playlist
+import time
 
-# https://www.googleapis.com/youtube/v3/search?key=AIzaSyDXhF1gPiuYdeQc-aBLbtAggYwRFZDSjg8&channelId=UCxGELV31d5e-llwFHiL0zIA&maxResults=50
+# https://www.gogleapis.com/youtube/v3/search?key=AIzaSyDXhF1gPiuYdeQc-aBLbtAggYwRFZDSjg8&channelId=UCxGELV31d5e-llwFHiL0zIA&maxResults=50
 # Ссылка со списком видео нас странице канала
 
-link = "https://www.youtube.com/watch?v=oqUqdyMRP-E"
 channel = "https://www.youtube.com/channel/UCxGELV31d5e-llwFHiL0zIA/videos"
+link = "https://www.youtube.com/watch?v=oqUqdyMRP-E"
+
+link = "https://youtube.com/watch?v=aGMNgLLcZWk"
 
 # загрузка конкретоного видео
 def download_video(link):
     yt = YouTube(link)
     print("Title:", yt.title) # Заголовок видео
     print("Views:", yt.views) # Количесво просмотров
-    print("Cap:", yt.captions)
-    print("Cap:", yt.channel_id)
+    print("date:", yt.publish_date) # Дата публикации видео
+    print("length:", time.strftime("%H:%M:%S", time.gmtime(yt.length))) # Продолжительность видео
+    # print("Cap:", yt.channel_id) # ID канала
     # Список всех вариантов качества видео + тут можно забрать отдельно дорожку звука
     # print("Streams: ", yt.streams)
 
@@ -23,15 +27,31 @@ def download_video(link):
     yt.streams.get_highest_resolution().download("videos")
 
 # Вызываем функцию загрзки конкретного видео
-# download_video(link)
+#download_video(link)
 
-link = "https://www.youtube.com/playlist?list=PLrHE5fFt2en98iI1dKYjQLx3SgyCIe6bi"
+link = "https://www.youtube.com/playlist?list=PLe-iIMbo5JOK17gsY2dEi90RP5fLemd9U"
 
 def download_playlist(link):
      playlist = Playlist(link)
      for video in playlist.videos:
-         print("T1:", video.title, "T2:", video.watch_url)
-         # video.streams.get_highest_resolution().download("videos")
+         video_file = video.title
+         print("#T1:", video.title, "T2:", video_file, "T3:", video.watch_url)
+         video_file = video_file.replace('.', '')
+         video_file = video_file.replace('#', '')
+         video_file = video_file.replace('|', '')
+         video_file = "./videos/" + video_file + ".mp4"
+         print("T2: ", video_file)
+         try:
+             file = open(video_file)
+         except IOError as e:
+             #print('T3: --NO --')
+             try:
+                 video.streams.get_highest_resolution().download("videos")
+             except:
+                 print("T3: --Удаляем файл --", video_file)
+         else:
+             with file:
+                 print('T3: --Пропускаем --')
 
 download_playlist(link)
 
